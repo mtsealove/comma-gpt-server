@@ -3430,13 +3430,6 @@ makeerror@1.0.12:
   dependencies:
     tmpl "1.0.5"
 
-mecab-ya@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/mecab-ya/-/mecab-ya-0.1.1.tgz#45989b4c3b63b74bd64368fba1fc4dea6ec3898d"
-  integrity sha512-3q0xRf3QRU+G5CRJpCnPrgZGkkPukbSj7xGt7ghyJfhcgJnIKg+TO3Tb4uadPA+cYQKFXovFjyLJdt45C+OfPQ==
-  dependencies:
-    shell-quote "^1.5.0"
-
 media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
@@ -4190,11 +4183,6 @@ shebang-regex@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
-
-shell-quote@^1.5.0:
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.8.1.tgz#6dbf4db75515ad5bac63b4f1894c3a154c766680"
-  integrity sha512-6j1W9l1iAs/4xYBI1SYOVZyFcCis9b4KCLQ8fgAGG07QvzaRLVVRQvAy85yNmmZSjYjg4MWh4gNvlPujU/5LpA==
 
 shelljs@0.8.5:
   version "0.8.5"

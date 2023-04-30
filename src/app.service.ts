@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Configuration, OpenAIApi } from 'openai';
-import * as mecab from 'mecab-ya';
 import { AxiosError } from 'axios';
+import mecab from './libs/mecab';
 
 @Injectable()
 export class AppService {
@@ -102,12 +102,10 @@ A: `;
   // 단어 추출
   private getNouns(question: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
-      mecab.nouns(question, (err, result) => {
-        if (err) {
-          reject();
-        } else {
-          resolve(result);
-        }
+      mecab(question, (str) => {
+        const filtered = str.filter((s) => s[1] === 'NNG');
+        const mapped: string[] = filtered.map((s) => s[0]);
+        resolve(mapped);
       });
     });
   }
