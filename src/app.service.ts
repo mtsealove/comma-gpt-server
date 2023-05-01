@@ -1,13 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Configuration, OpenAIApi } from 'openai';
+import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai';
 import { AxiosError } from 'axios';
 import mecab from './libs/mecab';
+import { Repository } from 'typeorm';
+import { Info } from './info.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreateInfoDto } from './create.info.dto';
 
 @Injectable()
 export class AppService {
   private readonly openai: OpenAIApi;
 
-  constructor() {
+  constructor(
+    @InjectRepository(Info)
+    private readonly infoRepo: Repository<Info>,
+  ) {
     const configuration = new Configuration({
       apiKey: process.env.OPEN_AI_KEY,
     });
@@ -52,29 +59,41 @@ export class AppService {
   }
 
   async getAnswer(question: string) {
+    /*
     const nouns = await this.getNouns(question);
     // 무조건 질문형으로 변경
     const questionFix = this.getQuestionFix(question);
     const prompt = `${this.getPrompt(nouns)}
 Q: ${questionFix}
 A: `;
+     */
+    const infos = await this.getInfos();
+    const messages: ChatCompletionRequestMessage[] = infos.map((i) => {
+      return {
+        role: 'assistant',
+        content: i.data,
+      };
+    });
+    console.log(messages);
     return new Promise((resolve, reject) => {
       this.openai
-        .createCompletion({
-          model: 'text-davinci-003',
-          prompt,
-          temperature: 0.7,
-          max_tokens: 2048,
-          top_p: 1,
-          frequency_penalty: 0.0,
-          presence_penalty: 0.6,
+        .createChatCompletion({
+          model: 'gpt-3.5-turbo',
+          temperature: 0,
+          messages: [
+            ...messages,
+            {
+              role: 'user',
+              content: question,
+            },
+          ],
         })
         .then((res) => {
           const { choices } = res.data;
           if (choices.length === 0) {
             throw new NotFoundException('질문을 이해할 수가 없습니다');
           }
-          resolve(choices[0].text);
+          resolve(choices[0].message.content);
         })
         .catch((e: AxiosError) => {
           console.error(e.response.data);
@@ -108,5 +127,38 @@ A: `;
         resolve(mapped);
       });
     });
+  }
+
+  async createInfo(dto: CreateInfoDto): Promise<Info> {
+    const { data } = dto;
+    const info = Info.create({ data });
+    await this.infoRepo.save(info);
+    return info;
+  }
+
+  async updateInfo(id: number, dto: CreateInfoDto): Promise<Info> {
+    const info = await this.getInfo(id);
+    const { data } = dto;
+    info.data = data;
+    await this.infoRepo.save(info);
+    return info;
+  }
+
+  async deleteInfo(id: number): Promise<Info> {
+    const info = await this.getInfo(id);
+    await this.infoRepo.remove(info);
+    return info;
+  }
+
+  async getInfo(id: number): Promise<Info> {
+    const info = await this.infoRepo.findOne({ where: { id } });
+    if (!info) {
+      throw new NotFoundException(`info ${id} not found`);
+    }
+    return info;
+  }
+
+  async getInfos(): Promise<Info[]> {
+    return await this.infoRepo.find();
   }
 }
